@@ -1,6 +1,8 @@
 syntax = "proto3";
 package vultisig.keysign.v1;
 
+import "vultisig/keysign/v1/wasm_execute_contract_payload.proto";
+
 option go_package = "github.com/vultisig/commondata/go/vultisig/keysign/v1;v1";
 option java_package = "vultisig.keysign.v1";
 option swift_prefix = "VS";
@@ -37,6 +39,38 @@ message MAYAChainSpecific {
   bool is_deposit = 3;
 }
 
+message CosmosFee {
+  repeated CosmosCoin amount = 1;
+  string gas = 2;
+  optional string payer = 3;
+  optional string granter = 4;
+  optional string fee_payer = 5;
+}
+
+message CosmosMsg {
+  string type = 1;
+  string value = 2;
+}
+
+message SignAmino {
+  CosmosFee fee = 1;
+  repeated CosmosMsg msgs = 2;
+}
+
+message SignDirect {
+  string body_bytes = 1;
+  string auth_info_bytes = 2;
+  string chain_id = 3;
+  string account_number = 4;
+}
+
+message CosmosSignPayload {
+  oneof sign_method {
+    SignAmino sign_amino = 1;
+    SignDirect sign_direct = 2;
+  }
+}
+
 message CosmosSpecific {
   uint64 account_number = 1;
   uint64 sequence = 2;
@@ -44,6 +78,7 @@ message CosmosSpecific {
   TransactionType transaction_type = 4;
   optional CosmosIbcDenomTrace ibc_denom_traces = 5;
   optional CosmosIbcInfo ibc_info = 6;
+  optional CosmosSignPayload sign_payload = 39;
 }
 
 message CosmosIbcDenomTrace {
